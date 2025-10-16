@@ -2,13 +2,26 @@ from collections import defaultdict
 import sys
 
 Q = []
+if sys.stdin.isatty():
+    # 対話入力（貼り付け）：空行で終了
+    while True:
+        try:
+            line = input().strip()
+        except EOFError:
+            break
+        if not line:
+            break
+        a, b, d = map(str.strip, line.split(','))
+        Q.append((int(a), int(b), float(d)))
+else:
+    # パイプ/リダイレクト：EOFまで読む（空行は無視）
+    for raw in sys.stdin:
+        line = raw.strip()
+        if not line:
+            continue
+        a, b, d = map(str.strip, line.split(','))
+        Q.append((int(a), int(b), float(d)))
 
-while True:
-    line = input().strip()
-    if not line:
-        break
-    a, b, d = map(str.strip, line.split(','))
-    Q.append((int(a), int(b), float(d)))
 
 
 adj = defaultdict(list)

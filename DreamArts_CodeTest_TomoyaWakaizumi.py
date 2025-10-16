@@ -39,11 +39,6 @@ def dfs(start, u, visited, path, cur_len, to_start=True):
     if cur_len > best_len:
         best_len = cur_len
         best_path = path[:]
-
-    if adj[u]:
-        optimistic = cur_len + adj[u][0][1]
-        if optimistic <= best_len:
-            return
         
     for v, w in adj[u]:
         if v not in visited:
@@ -58,9 +53,26 @@ def dfs(start, u, visited, path, cur_len, to_start=True):
                 best_len = total
                 best_path = path[:] + [start]
 
-#test
-for s in nodes:
-    dfs(s, s, {s}, [s], 0.0, to_start=True)
 
-print("best_len:", best_len)
-print("path:", " -> ".join(map(str, best_path)))
+start_order = sorted(nodes, key=lambda x: max_out.get(x, 0.0), reverse=True)
+
+for s in start_order:
+    visited = set([s])
+    dfs(s, s, visited, [s], 0.0, to_start=True)
+
+if best_len < 0 and nodes:
+    best_path = [min(nodes)]
+
+def normalize_cycle(path):
+    if len(path) >= 2 and path[0] == path[-1]:
+        core = path[:-1]
+        min_id = min(core)
+        idx = core.index(min_id)
+        path = core[idx:] + core[:idx] + [min_id]
+    return path
+
+best_path = normalize_cycle(best_path)
+
+out = sys.stdout
+for nid in best_path:
+    print(nid, file=out)
